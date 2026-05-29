@@ -1,6 +1,6 @@
 const TOKEN_KEY = 'brotrips.token';
 
-const API_BASE = (import.meta.env.VITE_API_URL ?? '/api').replace(/\/$/, '');
+const API_BASE = (import.meta.env.VITE_API_URL || '/api').replace(/\/$/, '');
 
 export function getToken(): string | null {
   return localStorage.getItem(TOKEN_KEY);
