@@ -6,6 +6,8 @@ import { useAuth } from '../auth';
 
 type Mode = 'signin' | 'register';
 
+const HAS_GOOGLE = Boolean(import.meta.env.VITE_GOOGLE_CLIENT_ID);
+
 export default function Login() {
   const { signIn } = useAuth();
   const nav = useNavigate();
@@ -99,42 +101,46 @@ export default function Login() {
           {err && <div className="error">{err}</div>}
         </form>
 
-        <div
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: 8,
-            margin: '16px 0',
-            color: '#9ca3af',
-            fontSize: 12,
-          }}
-        >
-          <hr style={{ flex: 1, border: 0, borderTop: '1px solid #e5e7eb' }} />
-          OR
-          <hr style={{ flex: 1, border: 0, borderTop: '1px solid #e5e7eb' }} />
-        </div>
+        {HAS_GOOGLE && (
+          <>
+            <div
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: 8,
+                margin: '16px 0',
+                color: '#9ca3af',
+                fontSize: 12,
+              }}
+            >
+              <hr style={{ flex: 1, border: 0, borderTop: '1px solid #e5e7eb' }} />
+              OR
+              <hr style={{ flex: 1, border: 0, borderTop: '1px solid #e5e7eb' }} />
+            </div>
 
-        <div style={{ display: 'flex', justifyContent: 'center' }}>
-          <GoogleLogin
-            onSuccess={async (resp) => {
-              setErr(null);
-              try {
-                const { token, user } = await api<{ token: string; user: User }>(
-                  '/auth/google',
-                  {
-                    method: 'POST',
-                    body: JSON.stringify({ credential: resp.credential }),
-                  },
-                );
-                signIn(token, user);
-                nav('/', { replace: true });
-              } catch (e) {
-                setErr((e as Error).message);
-              }
-            }}
-            onError={() => setErr('Google sign-in failed')}
-          />
-        </div>
+            <div style={{ display: 'flex', justifyContent: 'center' }}>
+              <GoogleLogin
+                onSuccess={async (resp) => {
+                  setErr(null);
+                  try {
+                    const { token, user } = await api<{ token: string; user: User }>(
+                      '/auth/google',
+                      {
+                        method: 'POST',
+                        body: JSON.stringify({ credential: resp.credential }),
+                      },
+                    );
+                    signIn(token, user);
+                    nav('/', { replace: true });
+                  } catch (e) {
+                    setErr((e as Error).message);
+                  }
+                }}
+                onError={() => setErr('Google sign-in failed')}
+              />
+            </div>
+          </>
+        )}
       </div>
     </div>
   );

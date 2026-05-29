@@ -70,12 +70,12 @@ src/
 
 ## Talking to the backend
 
-- Dev: `vite.config.ts` proxies `/api` → `http://localhost:4000`.
-- Prod: serve the built `dist/` from any static host. Either
-  (a) put the API behind the same origin under `/api`, or
-  (b) point the static host at the API with an env-driven base URL.
-  Today `src/api.ts` always calls `/api/...` — to use a non-same-origin
-  API, edit that one place (e.g. read `import.meta.env.VITE_API_URL`).
+- Dev: `vite.config.ts` proxies `/api` → `http://localhost:4000`, so leave
+  `VITE_API_URL` unset.
+- Same-origin prod: leave `VITE_API_URL` unset and have your reverse proxy
+  forward `/api/*` to the backend.
+- Different-origin prod: set `VITE_API_URL=https://api.example.com`. The
+  backend must allow your frontend origin via its `CORS_ORIGIN` env.
 
 ## Build
 
@@ -86,9 +86,46 @@ npm run preview      # serve the production build locally
 
 ## Deployment notes
 
-- The build is a static `dist/` — any static host works (S3 + CloudFront,
-  Netlify, Vercel, nginx, Caddy, a PaaS that serves static files, etc.).
-- For Google sign-in in production, add the deployed frontend origin to
-  the OAuth client's Authorized JavaScript origins in Google Cloud Console.
-- `VITE_GOOGLE_CLIENT_ID` is baked into the bundle at build time — set it
-  in the build environment, not at runtime.
+### Docker
+
+A multi-stage `Dockerfile` is included: build the React app with Node, then
+serve the resulting `dist/` from nginx with SPA fallback configured in
+`nginx.conf` (any unknown path returns `index.html` so React Router takes
+over).
+
+Because Vite bakes env vars into the bundle **at build time**, pass them as
+Docker build args:
+
+```sh
+docker build \
+  --build-arg VITE_API_URL=https://api.your-host.example \
+  --build-arg VITE_GOOGLE_CLIENT_ID=...apps.googleusercontent.com \
+  -t brotrips-frontend .
+
+docker run --rm -p 8080:80 brotrips-frontend
+```
+
+On PaaS targets (Coolify, Dokploy, Railway, Fly, Render, etc.) that auto-detect
+the Dockerfile, set the same names as **build args** (not just runtime env) in
+the service settings.
+
+### Without Docker
+
+The build is a static `dist/` — any static host works (S3 + CloudFront,
+Netlify, Vercel, nginx, Caddy, a PaaS that serves static files, etc.).
+
+```sh
+VITE_API_URL=https://api.your-host.example \
+VITE_GOOGLE_CLIENT_ID=...apps.googleusercontent.com \
+npm run build
+```
+
+### Google OAuth in production
+
+Add the deployed frontend origin (e.g. `https://app.your-host.example`) to
+the OAuth client's **Authorized JavaScript origins** in Google Cloud Console.
+
+### Graceful degradation
+
+If `VITE_GOOGLE_CLIENT_ID` is missing at build time, the app still loads —
+the Google button is just hidden and users can sign in with email + password.

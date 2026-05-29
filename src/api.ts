@@ -1,5 +1,7 @@
 const TOKEN_KEY = 'brotrips.token';
 
+const API_BASE = (import.meta.env.VITE_API_URL ?? '/api').replace(/\/$/, '');
+
 export function getToken(): string | null {
   return localStorage.getItem(TOKEN_KEY);
 }
@@ -17,7 +19,7 @@ export async function api<T = unknown>(
   const token = getToken();
   if (token) headers.set('Authorization', `Bearer ${token}`);
 
-  const res = await fetch(`/api${path}`, { ...init, headers });
+  const res = await fetch(`${API_BASE}${path}`, { ...init, headers });
   if (res.status === 204) return undefined as T;
   const data = await res.json().catch(() => ({}));
   if (!res.ok) {
