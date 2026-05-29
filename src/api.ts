@@ -1,6 +1,6 @@
 const TOKEN_KEY = 'brotrips.token';
 
-const API_BASE = import.meta.env.VITE_API_URL;
+const API_BASE = 'https://pro-tips-api.usectl.com/api';
 
 export function getToken(): string | null {
   return localStorage.getItem(TOKEN_KEY);
