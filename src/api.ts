@@ -1,8 +1,9 @@
 const TOKEN_KEY = 'brotrips.token';
 
 // Use || (not ??) so an empty VITE_API_URL build-arg still falls back to prod.
+// Domain is pro-trips (with the "r"), matching bro-trips — pro-tips 404s.
 const API_BASE =
-  import.meta.env.VITE_API_URL || 'https://pro-tips-api.usectl.com/api';
+  import.meta.env.VITE_API_URL || 'https://pro-trips-api.usectl.com/api';
 
 export function getToken(): string | null {
   return localStorage.getItem(TOKEN_KEY);
