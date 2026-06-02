@@ -1,6 +1,8 @@
 const TOKEN_KEY = 'brotrips.token';
 
-const API_BASE = 'https://pro-tips-api.usectl.com/api';
+// Use || (not ??) so an empty VITE_API_URL build-arg still falls back to prod.
+const API_BASE =
+  import.meta.env.VITE_API_URL || 'https://pro-tips-api.usectl.com/api';
 
 export function getToken(): string | null {
   return localStorage.getItem(TOKEN_KEY);
