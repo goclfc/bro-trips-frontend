@@ -72,3 +72,24 @@ export type Passenger = {
   picture: string | null;
   seats: number;
 };
+
+// Chat. ids come from BIGSERIAL columns and arrive as strings.
+export type ChatMessage = {
+  id: string;
+  sender_id: string;
+  sender_name: string;
+  sender_picture: string | null;
+  body: string | null;
+  created_at: string;
+  edited_at: string | null;
+  deleted: boolean;
+};
+
+export type Contact = {
+  id: string;
+  name: string;
+  picture: string | null;
+  online: boolean | null;
+  unread: number;
+  last_msg_id: string | null;
+};

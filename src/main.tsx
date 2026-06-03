@@ -3,6 +3,7 @@ import { createRoot } from 'react-dom/client';
 import { BrowserRouter } from 'react-router-dom';
 import { GoogleOAuthProvider } from '@react-oauth/google';
 import { AuthProvider } from './auth';
+import { ChatProvider } from './chat-context';
 import App from './App';
 import './styles.css';
 
@@ -18,7 +19,9 @@ createRoot(document.getElementById('root')!).render(
     <MaybeGoogleProvider>
       <BrowserRouter>
         <AuthProvider>
-          <App />
+          <ChatProvider>
+            <App />
+          </ChatProvider>
         </AuthProvider>
       </BrowserRouter>
     </MaybeGoogleProvider>
